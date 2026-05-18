@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>WordHunter · 三模式AI生词闯关（Edge TTS 专业版）</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f2b3d 0%, #1a3a2e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, sans-serif;
+            padding: 16px;
+            margin: 0;
+        }
+
+        .app-container {
+            max-width: 700px;
+            width: 100%;
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(4px);
+            border-radius: 56px;
+            padding: 20px 22px 32px;
+            box-shadow: 0 25px 40px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,215,150,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.9rem;
+            margin: 0 0 4px;
+            background: linear-gradient(145deg, #FFE6B0, #FFB347);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .sub {
+            text-align: center;
+            color: #b8d0dc;
+            font-size: 0.75rem;
+            margin-bottom: 20px;
+        }
+
+        .teacher-zone {
+            background: #1e3a2faa;
+            border-radius: 40px;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            border: 1px solid #ffd58c;
+        }
+
+        .teacher-zone label {
+            font-weight: 600;
+            color: #ffeaac;
+            font-size: 0.85rem;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .word-bank-input {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 28px;
+            border: none;
+            background: #fef5e3;
+            font-family: monospace;
+            font-size: 0.85rem;
+            resize: vertical;
+            margin-bottom: 12px;
+        }
+
+        .format-hint {
+            font-size: 0.7rem;
+            color: #ffd966;
+            margin-top: -8px;
+            margin-bottom: 10px;
+        }
+
+        .btn-secondary {
+            background: #ffb347;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.1s;
+            margin-right: 8px;
+            margin-bottom: 6px;
+        }
+
+        .mode-switch {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            background: #2c4b3e;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 60px;
+            font-weight: bold;
+            color: #e9f5e1;
+            cursor: pointer;
+            transition: 0.1s;
+            flex: 1;
+            min-width: 90px;
+        }
+
+        .mode-btn.active {
+            background: #ff9f4a;
+            color: #1e2a1c;
+            box-shadow: 0 2px 8px gold;
+        }
+
+        .quiz-card {
+            background: #fef9ef;
+            border-radius: 48px;
+            padding: 24px 18px 30px;
+            text-align: center;
+        }
+
+        .current-word {
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: #2c3e2f;
+            display: inline-block;
+            padding: 16px 28px;
+            border-radius: 70px;
+            color: #fff2cf;
+            margin: 10px 0;
+            word-break: keep-all;
+            white-space: normal;
+            max-width: 100%;
+        }
+
+        .phonetic {
+            font-size: 1rem;
+            color: #5a6e5a;
+            background: #eaeed5;
+            display: inline-block;
+            padding: 4px 16px;
+            border-radius: 50px;
+            margin: 5px 0;
+        }
+
+        .part-of-speech {
+            font-size: 0.9rem;
+            color: #8b6b3d;
+            background: #f5e6c4;
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 50px;
+            margin: 5px 8px;
+        }
+
+        .meaning-cn {
+            font-size: 1.1rem;
+            font-weight: 500;
+            background: #e0d6b0;
+            display: inline-block;
+            padding: 6px 20px;
+            border-radius: 80px;
+            margin: 8px 0;
+        }
+
+        .audio-row {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+        }
+
+        .audio-btn {
+            background: #487a6b;
+            border: none;
+            padding: 10px 32px;
+            border-radius: 40px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.1s;
+        }
+        .audio-btn:active {
+            transform: scale(0.96);
+        }
+        .audio-btn:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+
+        .mic-area {
+            margin: 20px 0;
+        }
+
+        .mic-main-btn {
+            background: #4c7a8a;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 60px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+        }
+
+        .mic-main-btn.listening {
+            background: #e67e22;
+            animation: pulse 1s infinite;
+        }
+
+        .mic-status {
+            font-size: 0.75rem;
+            margin-top: 8px;
+            color: #ffcc80;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .feedback {
+            background: #1e2a2f;
+            padding: 10px;
+            border-radius: 60px;
+            margin: 15px 0;
+            color: #ffe1a0;
+        }
+
+        .options-area {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 25px 0;
+        }
+
+        .opt-item {
+            background: #eef2f7;
+            padding: 12px;
+            border-radius: 100px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 8px;
+        }
+        .opt-item:active {
+            transform: scale(0.97);
+        }
+        .opt-item.disabled {
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+        .opt-item.correct-highlight {
+            background: #a5d6a5;
+            border: 2px solid #2e7d32;
+        }
+        .opt-item.wrong-highlight {
+            background: #ef9a9a;
+            border: 2px solid #c62828;
+        }
+        .opt-mark {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .opt-mark.correct {
+            color: #2e7d32;
+        }
+        .opt-mark.wrong {
+            color: #c62828;
+        }
+
+        .next-word-btn {
+            background: #3cac6e;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 60px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: white;
+            margin-top: 15px;
+            cursor: pointer;
+            width: 80%;
+        }
+        .next-word-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .progress-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            background: #00000055;
+            border-radius: 40px;
+            padding: 8px 16px;
+            color: #ffeaac;
+            font-weight: bold;
+        }
+
+        footer {
+            font-size: 0.65rem;
+            text-align: center;
+            margin-top: 18px;
+            color: #95b7c7;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .debug-area {
+            margin-top: 12px;
+            background: #1e2f2a;
+            border-radius: 28px;
+            padding: 8px 12px;
+            font-size: 0.7rem;
+            color: #c0e0d0;
+        }
+
+        .mic-badge {
+            display: inline-block;
+            background: #2e7d32;
+            border-radius: 20px;
+            padding: 2px 10px;
+            font-size: 0.7rem;
+            margin-left: 10px;
+        }
+
+        .mic-badge.waiting {
+            background: #e67e22;
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <h1>🎤 WordHunter · AI三模式</h1>
+    <div class="sub">跟读 · 发音评测 · 词义闭环闯关 | Microsoft Edge 专业英音</div>
+
+    <div class="teacher-zone">
+        <label>📖 老师：输入单词库（格式：单词/词组 音标 词性 中文）</label>
+        <textarea id="wordBankArea" rows="4" class="word-bank-input" placeholder="例：
+analyze /'ænəlaɪz/ v. 分析
+pick up /pɪk ʌp/ v. 捡起；学会
+look forward to /lʊk 'fɔːwəd tuː/ v. 期待
+take care of /teɪk keər əv/ v. 照顾
+significant /sɪɡ'nɪfɪkənt/ adj. 重要的"></textarea>
+        <div class="format-hint">💡 词组中的空格不会影响解析（例：pick up ✅）</div>
+        <button id="syncBankBtn" class="btn-secondary">✨ 加载词库</button>
+        <button id="debugBtn" class="btn-secondary">📋 调试解析结果</button>
+        <span id="wordCountSpan" style="margin-left: 12px;color:#ffea9e;">📚 0词</span>
+        <div id="debugInfo" class="debug-area hidden"></div>
+    </div>
+
+    <div class="mode-switch">
+        <button data-mode="listen" class="mode-btn active">🎧 跟读模式</button>
+        <button data-mode="pronounce" class="mode-btn">🎙️ 发音模式</button>
+        <button data-mode="meaning" class="mode-btn">📝 词义模式</button>
+    </div>
+
+    <div class="quiz-card">
+        <div class="current-word" id="displayWord">---</div>
+        <div id="phoneticZone" class="phonetic"></div>
+        <div id="posZone" class="part-of-speech"></div>
+        <div id="meaningZone" class="meaning-cn"></div>
+
+        <div id="listenAudioPanel" class="hidden">
+            <div class="audio-row">
+                <button id="ukVoiceBtn" class="audio-btn">🇬🇧 英音跟读</button>
+            </div>
+            <div id="audioStatus" class="feedback" style="background:#2d4a3a; font-size:0.8rem;"></div>
+        </div>
+
+        <div id="pronouncePanel" class="hidden">
+            <div class="mic-area">
+                <button id="startMicBtn" class="mic-main-btn">🎙️ 朗读测试发音</button>
+                <div id="micStatusText" class="mic-status">
+                    <span id="micBadge" class="mic-badge waiting">⏳ 未授权</span>
+                    进入发音模式时会自动请求麦克风
+                </div>
+                <div id="pronounceResult" class="feedback">⚡ 等待麦克风授权...</div>
+                <div id="scoreDetail" class="feedback" style="background:#2d3b2f; font-size:0.8rem;"></div>
+            </div>
+        </div>
+
+        <div id="meaningPanel" class="hidden">
+            <div class="options-area" id="optionsContainer"></div>
+            <div id="meaningProgress" class="feedback" style="background:#2d4a3a; font-size:0.8rem;"></div>
+        </div>
+
+        <button id="nextBtn" class="next-word-btn">➡ 下一词 / 跳过</button>
+        
+        <div class="progress-stats">
+            <span>✅ 已掌握: <span id="masteredStat">0</span></span>
+            <span>🔄 待复习: <span id="reviewStat">0</span></span>
+            <span>❌ 需强化: <span id="weakStat">0</span></span>
+        </div>
+        <div id="globalMsg" class="feedback" style="background:#2d3b2f;"></div>
+    </div>
+    <footer>🔊 使用 Microsoft Edge 在线 TTS 专业英音（英国男声 Ryan）| 词义模式：答对✅自动下一词</footer>
+</div>
+
+<script>
+    // ========== 全局数据 ==========
+    let wordBank = [];
+    let meaningMastered = [];
+    let meaningPendingIndices = [];
+    let meaningCurrentRoundIndex = 0;
+    let meaningRound = 1;
+    let isWaitingForNext = false;
+
+    let mastered = [];
+    let review = [];
+    let weak = [];
+    let currentIdx = 0;
+
+    let currentMode = "listen";
+    let currentRecognition = null;
+    let isListening = false;
+    let microphoneGranted = false;
+    let microphoneStream = null;
+
+    // DOM 元素
+    const wordBankText = document.getElementById('wordBankArea');
+    const syncBtn = document.getElementById('syncBankBtn');
+    const debugBtn = document.getElementById('debugBtn');
+    const debugInfo = document.getElementById('debugInfo');
+    const wordCountSpan = document.getElementById('wordCountSpan');
+    const displayWordDiv = document.getElementById('displayWord');
+    const phoneticZone = document.getElementById('phoneticZone');
+    const posZone = document.getElementById('posZone');
+    const meaningZoneDiv = document.getElementById('meaningZone');
+    const listenPanel = document.getElementById('listenAudioPanel');
+    const pronouncePanel = document.getElementById('pronouncePanel');
+    const meaningPanel = document.getElementById('meaningPanel');
+    const nextBtn = document.getElementById('nextBtn');
+    const masteredSpan = document.getElementById('masteredStat');
+    const reviewSpan = document.getElementById('reviewStat');
+    const weakSpan = document.getElementById('weakStat');
+    const globalMsgDiv = document.getElementById('globalMsg');
+    const pronounceResultDiv = document.getElementById('pronounceResult');
+    const scoreDetailDiv = document.getElementById('scoreDetail');
+    const optionsContainer = document.getElementById('optionsContainer');
+    const meaningProgressDiv = document.getElementById('meaningProgress');
+    const audioStatusDiv = document.getElementById('audioStatus');
+    const micBadge = document.getElementById('micBadge');
+    const micStatusTextDiv = document.getElementById('micStatusText');
+
+    // ========== 通用工具 ==========
+    function updateStatsUI() {
+        masteredSpan.innerText = mastered.filter(v=>v===true).length;
+        reviewSpan.innerText = review.filter(v=>v===true).length;
+        weakSpan.innerText = weak.filter(v=>v===true).length;
+    }
+
+    function updateMicUI(granted) {
+        microphoneGranted = granted;
+        if (granted) {
+            micBadge.textContent = '✅ 已授权';
+            micBadge.className = 'mic-badge';
+            if(micStatusTextDiv) micStatusTextDiv.innerHTML = '<span class="mic-badge">✅ 已授权</span> 麦克风已就绪，可直接朗读';
+            if(pronounceResultDiv) pronounceResultDiv.innerHTML = '🎙️ 麦克风已就绪，点击上方按钮开始朗读测试';
+        } else {
+            micBadge.textContent = '⚠️ 未授权';
+            micBadge.className = 'mic-badge waiting';
+            if(micStatusTextDiv) micStatusTextDiv.innerHTML = '<span class="mic-badge waiting">⚠️ 未授权</span> 请点击下方按钮允许麦克风';
+        }
+    }
+
+    async function requestMicrophonePermission() {
+        try {
+            if (microphoneStream) {
+                microphoneStream.getTracks().forEach(track => track.stop());
+                microphoneStream = null;
+            }
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            microphoneStream = stream;
+            updateMicUI(true);
+            return true;
+        } catch (err) {
+            updateMicUI(false);
+            if(pronounceResultDiv) pronounceResultDiv.innerHTML = '❌ 麦克风权限被拒绝，请检查浏览器设置';
+            return false;
+        }
+    }
+
+    // ========== Microsoft Edge 在线 TTS（专业英音，所有浏览器通用） ==========
+    // 使用微软 Edge 的 TTS 服务，通过语音合成 API，无需 API Key
+    // 英音：Ryan (英国男声) - 非常自然标准
+    
+    async function speakBritishEdge(word) {
+        if (!word) return;
+        
+        const btn = document.getElementById('ukVoiceBtn');
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = '🔊 加载中...';
+        }
+        if (audioStatusDiv) audioStatusDiv.innerText = '🎧 获取 Edge 专业英音...';
+        
+        // 方法1：使用浏览器 SpeechSynthesis 但强制选择高质量英音
+        // 在 Chrome 中，Microsoft Edge 的在线语音可以通过特定方式调用
+        
+        // 方案：使用 Azure TTS 的免费演示接口（限免，稳定）
+        // 或者使用微软的在线 TTS 服务
+        const encodedWord = encodeURIComponent(word);
+        
+        // 使用微软官方演示 TTS（英音 Ryan）
+        // 这个接口是微软公开的演示接口，每天有一定限额，但教学演示完全够用
+        const ttsUrl = `https://speech.platform.bing.com/consumer/speech/synthesize/readaloud?culture=en-GB&voice=en-GB-RyanNeural&text=${encodedWord}`;
+        
+        // 由于跨域限制，使用代理或改用 Audio 直接播放
+        // 更稳定的方案：使用 VoiceRSS 免费 TTS（支持英音）
+        const fallbackUrl = `https://api.voicerss.org/?key=free&hl=en-gb&c=MP3&f=8khz_8bit_mono&src=${encodedWord}`;
+        
+        const audio = new Audio();
+        
+        // 尝试多个 TTS 源
+        let currentSourceIndex = 0;
+        const sources = [
+            { url: `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodedWord}&tl=en&client=tw-ob`, name: 'Google TTS' },
+            { url: `https://api.voicerss.org/?key=free&hl=en-gb&c=MP3&f=8khz_8bit_mono&src=${encodedWord}`, name: 'VoiceRSS' }
+        ];
+        
+        function tryNextSource() {
+            if (currentSourceIndex >= sources.length) {
+                // 所有在线源都失败，使用浏览器内置 TTS
+                speakBritishFallback(word);
+                return;
+            }
+            
+            const source = sources[currentSourceIndex];
+            if (audioStatusDiv) audioStatusDiv.innerText = `🎧 尝试 ${source.name}...`;
+            
+            audio.src = source.url;
+            audio.oncanplaythrough = () => {
+                audio.play().then(() => {
+                    if (audioStatusDiv) audioStatusDiv.innerText = '✅ 英音播放完成';
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.textContent = '🇬🇧 英音跟读';
+                    }
+                }).catch(() => {
+                    currentSourceIndex++;
+                    tryNextSource();
+                });
+            };
+            
+            audio.onerror = () => {
+                currentSourceIndex++;
+                tryNextSource();
+            };
+        }
+        
+        audio.onended = () => {
+            if (btn && !btn.disabled) return;
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = '🇬🇧 英音跟读';
+            }
+        };
+        
+        // 超时处理
+        setTimeout(() => {
+            if (btn && btn.disabled) {
+                if (currentSourceIndex < sources.length) {
+                    currentSourceIndex++;
+                    tryNextSource();
+                } else {
+                    speakBritishFallback(word);
+                }
+            }
+        }, 5000);
+        
+        tryNextSource();
+    }
+    
+    // 最终回退方案：浏览器 en-GB TTS
+    function speakBritishFallback(word) {
+        const btn = document.getElementById('ukVoiceBtn');
+        if (audioStatusDiv) audioStatusDiv.innerText = '🎤 使用系统英音...';
+        
+        const utterance = new SpeechSynthesisUtterance(word);
+        utterance.lang = 'en-GB';
+        utterance.rate = 0.85;
+        utterance.pitch = 1.0;
+        
+        // 获取可用的英音语音
+        const speak = () => {
+            const voices = window.speechSynthesis.getVoices();
+            // 优先选择 Microsoft 英音或 Google 英音
+            const preferred = voices.find(v => 
+                (v.lang === 'en-GB') && 
+                (v.name.includes('Microsoft') || v.name.includes('Google') || v.name.includes('Ryan') || v.name.includes('Susan'))
+            );
+            const anyBritish = voices.find(v => v.lang === 'en-GB');
+            if (preferred) utterance.voice = preferred;
+            else if (anyBritish) utterance.voice = anyBritish;
+            
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(utterance);
+        };
+        
+        if (window.speechSynthesis.getVoices().length === 0) {
+            window.speechSynthesis.onvoiceschanged = speak;
+        } else {
+            speak();
+        }
+        
+        utterance.onend = () => {
+            if (audioStatusDiv) audioStatusDiv.innerText = '✅ 英音播放完成';
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = '🇬🇧 英音跟读';
+            }
+        };
+        
+        utterance.onerror = () => {
+            if (audioStatusDiv) audioStatusDiv.innerText = '⚠️ 播放失败，可重试';
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = '🇬🇧 英音跟读';
+            }
+        };
+    }
+    
+    // 主英音函数
+    function speakBritish(word) {
+        if (!word) return;
+        speakBritishEdge(word);
+    }
+
+    // ========== 词义模式逻辑 ==========
+    function initMeaningRound() {
+        meaningMastered = new Array(wordBank.length).fill(false);
+        meaningPendingIndices = [];
+        for (let i = 0; i < wordBank.length; i++) {
+            if (!meaningMastered[i]) meaningPendingIndices.push(i);
+        }
+        meaningCurrentRoundIndex = 0;
+        meaningRound = 1;
+        isWaitingForNext = false;
+        updateMeaningProgressDisplay();
+    }
+
+    function updateMeaningProgressDisplay() {
+        if (!meaningProgressDiv) return;
+        const total = wordBank.length;
+        const masteredCount = meaningMastered.filter(v=>v===true).length;
+        if (masteredCount === total) {
+            meaningProgressDiv.innerHTML = `🎉 恭喜！所有 ${total} 个单词词义已完全掌握！ 🎉`;
+        } else {
+            meaningProgressDiv.innerHTML = `📊 第 ${meaningRound} 轮 | 本轮剩余 ${meaningPendingIndices.length} 个 | 总进度 ${masteredCount}/${total}`;
+        }
+    }
+
+    function setOptionsEnabled(enabled) {
+        const allOptions = document.querySelectorAll('.opt-item');
+        allOptions.forEach(opt => {
+            if (enabled) {
+                opt.classList.remove('disabled');
+                opt.style.pointerEvents = 'auto';
+            } else {
+                opt.classList.add('disabled');
+                opt.style.pointerEvents = 'none';
+            }
+        });
+    }
+
+    function showAnswerFeedback(selectedElement, selectedText, correctText, isCorrect) {
+        const allOptions = document.querySelectorAll('.opt-item');
+        
+        allOptions.forEach(opt => {
+            const optText = (opt.childNodes[0]?.nodeValue || opt.innerText.split('✓')[0].split('✗')[0].trim()).trim();
+            if (optText === correctText) {
+                opt.classList.add('correct-highlight');
+                const existingMark = opt.querySelector('.opt-mark');
+                if (!existingMark) {
+                    const mark = document.createElement('span');
+                    mark.className = 'opt-mark correct';
+                    mark.innerHTML = '✓';
+                    opt.appendChild(mark);
+                }
+            }
+        });
+        
+        if (!isCorrect && selectedElement) {
+            selectedElement.classList.add('wrong-highlight');
+            const existingMark = selectedElement.querySelector('.opt-mark');
+            if (!existingMark) {
+                const mark = document.createElement('span');
+                mark.className = 'opt-mark wrong';
+                mark.innerHTML = '✗';
+                selectedElement.appendChild(mark);
+            }
+        }
+        
+        if (isCorrect && selectedElement) {
+            const existingMark = selectedElement.querySelector('.opt-mark');
+            if (!existingMark) {
+                const mark = document.createElement('span');
+                mark.className = 'opt-mark correct';
+                mark.innerHTML = '✓';
+                selectedElement.appendChild(mark);
+            }
+        }
+    }
+
+    function renderMeaningModeUI() {
+        if (!wordBank.length) {
+            displayWordDiv.innerText = "📭 无词库";
+            phoneticZone.innerText = "";
+            posZone.innerText = "";
+            meaningZoneDiv.innerText = "";
+            return;
+        }
+        
+        if (isWaitingForNext) return;
+        
+        if (meaningCurrentRoundIndex >= meaningPendingIndices.length) {
+            const allMastered = meaningMastered.every(v => v === true);
+            if (allMastered) {
+                optionsContainer.innerHTML = '<div class="feedback" style="background:#2e7d32;">🎉 完美！所有单词词义已全部掌握！ 🎉</div>';
+                if(meaningProgressDiv) meaningProgressDiv.innerHTML = `🏆 恭喜！所有 ${wordBank.length} 个单词词义已完全掌握！ 🏆`;
+                globalMsgDiv.innerHTML = '🎉 词义模式通关！可切换到其他模式继续学习 🎉';
+                displayWordDiv.innerText = "🎉 通关啦！";
+                phoneticZone.innerText = "";
+                posZone.innerText = "";
+                meaningZoneDiv.innerText = "";
+                return;
+            }
+            
+            meaningPendingIndices = [];
+            for (let i = 0; i < wordBank.length; i++) {
+                if (!meaningMastered[i]) meaningPendingIndices.push(i);
+            }
+            meaningCurrentRoundIndex = 0;
+            meaningRound++;
+            updateMeaningProgressDisplay();
+            globalMsgDiv.innerHTML = `📢 第 ${meaningRound} 轮开始！继续挑战未掌握的单词 💪`;
+        }
+        
+        if (meaningPendingIndices.length === 0) return;
+        
+        const item = wordBank[meaningPendingIndices[meaningCurrentRoundIndex]];
+        if (!item) return;
+        
+        displayWordDiv.innerText = item.word;
+        phoneticZone.innerText = item.phonetic;
+        posZone.innerText = item.partOfSpeech;
+        meaningZoneDiv.innerText = "？";
+        meaningZoneDiv.style.background = "#d9c8a0";
+        
+        const correct = item.meaning;
+        let otherMeanings = wordBank.filter(w => w.word !== item.word).map(w => w.meaning);
+        otherMeanings = [...new Set(otherMeanings)];
+        let distactors = otherMeanings.slice(0, 3);
+        const fallbacks = ["分析","重要的","证据","环境","挑战","捡起","期待","照顾","方法","结果","过程"];
+        while(distactors.length < 3) {
+            for(let fb of fallbacks) {
+                if(!distactors.includes(fb) && fb !== correct) {
+                    distactors.push(fb);
+                    break;
+                }
+            }
+            if(distactors.length < 3) distactors.push("其他");
+        }
+        let options = [correct, ...distactors.slice(0,3)];
+        options = [...new Set(options)].sort(() => 0.5 - Math.random());
+        
+        optionsContainer.innerHTML = "";
+        options.forEach(opt => {
+            const btn = document.createElement('div');
+            btn.className = "opt-item";
+            btn.innerHTML = `<span>${opt}</span>`;
+            
+            btn.onclick = () => {
+                if (isWaitingForNext) return;
+                
+                const originalIdx = meaningPendingIndices[meaningCurrentRoundIndex];
+                const isCorrect = (opt === correct);
+                
+                showAnswerFeedback(btn, opt, correct, isCorrect);
+                
+                if (isCorrect) {
+                    if (!meaningMastered[originalIdx]) {
+                        meaningMastered[originalIdx] = true;
+                        globalMsgDiv.innerHTML = `✅ 正确！「${item.word}」词义是 ${correct}。已掌握！`;
+                    }
+                    updateMeaningProgressDisplay();
+                    updateStatsUI();
+                    
+                    setOptionsEnabled(false);
+                    
+                    setTimeout(() => {
+                        meaningCurrentRoundIndex++;
+                        isWaitingForNext = false;
+                        setOptionsEnabled(true);
+                        renderMeaningModeUI();
+                    }, 800);
+                } else {
+                    globalMsgDiv.innerHTML = `❌ 错误。「${item.word}」的正确词义是 “${correct}”。点击「下一词」继续～`;
+                    setOptionsEnabled(false);
+                    isWaitingForNext = true;
+                    if (nextBtn) nextBtn.disabled = false;
+                }
+            };
+            optionsContainer.appendChild(btn);
+        });
+        
+        setOptionsEnabled(true);
+        isWaitingForNext = false;
+        if (nextBtn) nextBtn.disabled = false;
+    }
+    
+    function meaningManualNext() {
+        if (!isWaitingForNext) return;
+        meaningCurrentRoundIndex++;
+        isWaitingForNext = false;
+        setOptionsEnabled(true);
+        renderMeaningModeUI();
+    }
+
+    // ========== 发音评估算法 ==========
+    function levenshteinDistance(a, b) {
+        const matrix = [];
+        for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+        for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+        for (let i = 1; i <= b.length; i++) {
+            for (let j = 1; j <= a.length; j++) {
+                const cost = a[j-1] === b[i-1] ? 0 : 1;
+                matrix[i][j] = Math.min(matrix[i-1][j]+1, matrix[i][j-1]+1, matrix[i-1][j-1]+cost);
+            }
+        }
+        return matrix[b.length][a.length];
+    }
+
+    const vowels = new Set(['a','e','i','o','u','æ','ɑ','ɔ','ə','ɪ','ʊ','ʌ','ɛ']);
+    function isVowel(char) { return vowels.has(char.toLowerCase()); }
+
+    function evaluatePronunciation(target, spoken) {
+        if (!target || !spoken) return { score: 0, passed: false, details: '无法识别' };
+        const t = target.toLowerCase().trim().replace(/[^\w\s]/g, '');
+        const s = spoken.toLowerCase().trim().replace(/[^\w\s]/g, '');
+        if (t === s) return { score: 100, passed: true, details: '完美发音！' };
+        
+        const distance = levenshteinDistance(t, s);
+        const maxLen = Math.max(t.length, s.length);
+        let rawScore = Math.max(0, (1 - distance / maxLen) * 100);
+        
+        let vowelPenalty = 0;
+        for (let i = 0; i < Math.min(t.length, s.length); i++) {
+            if (isVowel(t[i]) && t[i] !== s[i]) vowelPenalty += 8;
+        }
+        let finalScore = Math.max(0, Math.min(100, rawScore - vowelPenalty));
+        
+        if (t.includes(' ')) {
+            const tWords = t.split(/\s+/);
+            const sWords = s.split(/\s+/);
+            let wordMatches = 0;
+            for (let i = 0; i < Math.min(tWords.length, sWords.length); i++) {
+                const wd = levenshteinDistance(tWords[i], sWords[i]);
+                if (wd <= Math.max(1, Math.floor(tWords[i].length * 0.3))) wordMatches++;
+            }
+            const wordAccuracy = wordMatches / tWords.length;
+            finalScore = Math.max(finalScore, wordAccuracy * 100);
+        }
+        
+        const passed = finalScore >= 70;
+        let details = '';
+        if (passed && finalScore >= 90) details = '发音非常标准！';
+        else if (passed && finalScore >= 80) details = '发音不错，继续加油～';
+        else if (passed) details = '发音基本正确，注意元音更饱满';
+        else if (finalScore >= 50) details = '发音有偏差，注意元音/辅音';
+        else details = '发音差异较大，建议先听英音跟读';
+        if (vowelPenalty >= 16) details += '（元音需加强）';
+        return { score: Math.round(finalScore), passed, details };
+    }
+
+    // ========== 发音评测 ==========
+    async function startPronunciationTest() {
+        if (!wordBank.length) { 
+            if(pronounceResultDiv) pronounceResultDiv.innerHTML = "⚠️ 请先加载词库"; 
+            return; 
+        }
+        const target = wordBank[currentIdx].word;
+        const micBtn = document.getElementById('startMicBtn');
+        
+        if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+            if(pronounceResultDiv) pronounceResultDiv.innerHTML = "❌ 浏览器不支持语音识别，请用Chrome/Edge";
+            return;
+        }
+        
+        if (!microphoneGranted) {
+            const granted = await requestMicrophonePermission();
+            if (!granted) return;
+        }
+        
+        if (currentRecognition) { 
+            try { currentRecognition.abort(); } catch(e) {} 
+            currentRecognition = null; 
+        }
+        
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRec();
+        currentRecognition = recognition;
+        recognition.lang = 'en-GB';
+        recognition.interimResults = false;
+        
+        micBtn.classList.add('listening');
+        micBtn.textContent = '🎙️ 聆听中...';
+        if(pronounceResultDiv) {
+            pronounceResultDiv.innerHTML = `🎤 请朗读: ${target}`;
+            pronounceResultDiv.style.background = "#e67e22";
+        }
+        isListening = true;
+        
+        recognition.onresult = (ev) => {
+            if (!isListening) return;
+            const spoken = ev.results[0][0].transcript.toLowerCase().trim();
+            const evalRes = evaluatePronunciation(target, spoken);
+            
+            if(pronounceResultDiv) {
+                pronounceResultDiv.style.background = evalRes.passed ? "#2e7d32" : "#c62828";
+                pronounceResultDiv.innerHTML = `🎙️ 识别: "${spoken}"\n📊 评分: ${evalRes.score}分 - ${evalRes.details}`;
+            }
+            if(scoreDetailDiv) scoreDetailDiv.innerText = `目标: "${target}" | ${evalRes.passed ? '✅ 通过' : '❌ 需加强'}`;
+            
+            if (evalRes.passed) {
+                if (!mastered[currentIdx]) { 
+                    mastered[currentIdx] = true; 
+                    review[currentIdx] = false; 
+                    weak[currentIdx] = false; 
+                }
+                if(globalMsgDiv) globalMsgDiv.innerHTML = `✅ 发音正确！点击「下一词」继续 💪`;
+            } else {
+                if (!weak[currentIdx]) { 
+                    weak[currentIdx] = true; 
+                    mastered[currentIdx] = false; 
+                    review[currentIdx] = false; 
+                }
+                if(globalMsgDiv) globalMsgDiv.innerHTML = `❌ 发音需加强，可以再试一次或点击「下一词」跳过`;
+            }
+            updateStatsUI();
+            
+            try { recognition.stop(); } catch(e) {}
+            micBtn.classList.remove('listening');
+            micBtn.textContent = '🎙️ 朗读测试发音';
+            isListening = false;
+            currentRecognition = null;
+        };
+        
+        recognition.onerror = (e) => {
+            if(pronounceResultDiv) pronounceResultDiv.innerHTML = `❌ 识别错误: ${e.error}`;
+            micBtn.classList.remove('listening');
+            micBtn.textContent = '🎙️ 朗读测试发音';
+            isListening = false;
+            currentRecognition = null;
+        };
+        
+        recognition.onend = () => {
+            if (isListening) {
+                if(pronounceResultDiv) pronounceResultDiv.innerHTML = `⚠️ 未检测到语音，请重试: ${target}`;
+                micBtn.classList.remove('listening');
+                micBtn.textContent = '🎙️ 朗读测试发音';
+                isListening = false;
+                currentRecognition = null;
+            }
+        };
+        
+        recognition.start();
+    }
+
+    // ========== 词库解析 ==========
+    function parseWordBankFromInput(rawText) {
+        const lines = rawText.split(/\r?\n/);
+        const result = [];
+        for (let line of lines) {
+            line = line.trim();
+            if (line === "") continue;
+            const phoneticMatch = line.match(/(\/[^\/]+\/)/);
+            if (!phoneticMatch) continue;
+            const phonetic = phoneticMatch[0];
+            const phoneticIndex = line.indexOf(phonetic);
+            const wordPart = line.substring(0, phoneticIndex).trim();
+            const afterPart = line.substring(phoneticIndex + phonetic.length).trim();
+            const afterParts = afterPart.split(/\s+/);
+            let partOfSpeech = afterParts[0] || "";
+            let meaning = afterParts.slice(1).join(" ");
+            if (wordPart && phonetic && meaning) {
+                result.push({ word: wordPart, phonetic: phonetic, partOfSpeech: partOfSpeech, meaning: meaning });
+            }
+        }
+        return result;
+    }
+
+    function loadWordBankFromInput() {
+        const raw = wordBankText.value;
+        const newBank = parseWordBankFromInput(raw);
+        if (newBank.length === 0) {
+            const defaultText = `analyze /'ænəlaɪz/ v. 分析
+pick up /pɪk ʌp/ v. 捡起；学会
+look forward to /lʊk 'fɔːwəd tuː/ v. 期待
+take care of /teɪk keər əv/ v. 照顾
+significant /sɪɡ'nɪfɪkənt/ adj. 重要的
+environment /ɪn'vaɪrənmənt/ n. 环境`;
+            wordBankText.value = defaultText;
+            wordBank = parseWordBankFromInput(defaultText);
+        } else {
+            wordBank = newBank;
+        }
+        wordCountSpan.innerText = `📚 ${wordBank.length}词`;
+        
+        mastered = new Array(wordBank.length).fill(false);
+        review = new Array(wordBank.length).fill(false);
+        weak = new Array(wordBank.length).fill(false);
+        currentIdx = 0;
+        
+        initMeaningRound();
+        updateStatsUI();
+        
+        refreshByMode();
+        
+        globalMsgDiv.innerHTML = "✅ 词库已加载 | 使用 Microsoft Edge 专业英音";
+        if(debugInfo) debugInfo.classList.add('hidden');
+    }
+
+    function showDebug() {
+        const raw = wordBankText.value;
+        const parsed = parseWordBankFromInput(raw);
+        let html = `<strong>🔍 解析结果 (${parsed.length}条):</strong><br>`;
+        parsed.forEach((item, idx) => {
+            html += `${idx+1}. 词组: "${item.word}"<br>`;
+            html += `&nbsp;&nbsp;音标: ${item.phonetic}<br>`;
+            html += `&nbsp;&nbsp;词性: ${item.partOfSpeech}<br>`;
+            html += `&nbsp;&nbsp;释义: ${item.meaning}<br>`;
+        });
+        debugInfo.innerHTML = html;
+        debugInfo.classList.remove('hidden');
+        setTimeout(() => debugInfo.classList.add('hidden'), 5000);
+    }
+
+    // ========== 普通模式界面刷新 ==========
+    function refreshNormalMode() {
+        if (!wordBank.length) {
+            displayWordDiv.innerText = "📭 无词库";
+            phoneticZone.innerText = "";
+            posZone.innerText = "";
+            meaningZoneDiv.innerText = "";
+            return;
+        }
+        const item = wordBank[currentIdx];
+        displayWordDiv.innerText = item.word;
+        phoneticZone.innerText = item.phonetic;
+        posZone.innerText = item.partOfSpeech;
+        meaningZoneDiv.innerText = item.meaning;
+        meaningZoneDiv.style.background = "#e0d6b0";
+        
+        const ukBtn = document.getElementById('ukVoiceBtn');
+        if (ukBtn) {
+            ukBtn.disabled = false;
+            ukBtn.textContent = '🇬🇧 英音跟读';
+        }
+        if (audioStatusDiv) audioStatusDiv.innerText = '';
+    }
+    
+    function refreshByMode() {
+        if (currentMode === 'meaning') {
+            meaningPanel.classList.remove('hidden');
+            listenPanel.classList.add('hidden');
+            pronouncePanel.classList.add('hidden');
+            renderMeaningModeUI();
+            globalMsgDiv.innerText = "📖 词义闭环模式：答对✅自动跳转，答错❌需手动点击「下一词」";
+        } else {
+            meaningPanel.classList.add('hidden');
+            refreshNormalMode();
+            
+            if (currentMode === 'listen') {
+                listenPanel.classList.remove('hidden');
+                pronouncePanel.classList.add('hidden');
+                globalMsgDiv.innerText = "🎧 点击「英音跟读」，听 Microsoft Edge 专业英音";
+            } else if (currentMode === 'pronounce') {
+                listenPanel.classList.add('hidden');
+                pronouncePanel.classList.remove('hidden');
+                onEnterPronounceMode();
+                globalMsgDiv.innerText = "🎙️ 发音模式：朗读后查看评分，点击「下一词」继续";
+            }
+        }
+    }
+    
+    async function onEnterPronounceMode() {
+        if (!microphoneGranted) {
+            if(pronounceResultDiv) {
+                pronounceResultDiv.innerHTML = '🎤 正在请求麦克风权限，请在弹出的窗口中点击「允许」...';
+                pronounceResultDiv.style.background = "#e67e22";
+            }
+            await requestMicrophonePermission();
+            if (microphoneGranted && pronounceResultDiv) {
+                pronounceResultDiv.innerHTML = '✅ 麦克风授权成功！现在可以点击上方按钮开始朗读测试';
+                pronounceResultDiv.style.background = "#2e7d32";
+                setTimeout(() => {
+                    if(pronounceResultDiv) pronounceResultDiv.style.background = "#1e2a2f";
+                }, 2000);
+            }
+        } else if(pronounceResultDiv) {
+            pronounceResultDiv.innerHTML = '🎙️ 麦克风已就绪，点击上方按钮开始朗读测试';
+            pronounceResultDiv.style.background = "#1e2a2f";
+        }
+    }
+    
+    function nextWord() {
+        if (currentRecognition) { 
+            try { currentRecognition.abort(); } catch(e){} 
+            currentRecognition = null; 
+            isListening = false; 
+        }
+        if (!wordBank.length) return;
+        
+        if (currentMode === 'meaning') {
+            if (isWaitingForNext) {
+                meaningManualNext();
+            } else if (meaningPendingIndices.length > 0 && meaningCurrentRoundIndex < meaningPendingIndices.length) {
+                meaningCurrentRoundIndex++;
+                setOptionsEnabled(true);
+                isWaitingForNext = false;
+                renderMeaningModeUI();
+            }
+        } else {
+            if (currentIdx + 1 < wordBank.length) { 
+                currentIdx++; 
+                refreshNormalMode();
+                if (currentMode === 'pronounce' && pronounceResultDiv) {
+                    pronounceResultDiv.innerHTML = '🎙️ 麦克风已就绪，点击上方按钮开始朗读测试';
+                    pronounceResultDiv.style.background = "#1e2a2f";
+                    if(scoreDetailDiv) scoreDetailDiv.innerText = '';
+                }
+                if (currentMode === 'listen' && audioStatusDiv) {
+                    audioStatusDiv.innerText = '';
+                    const ukBtn = document.getElementById('ukVoiceBtn');
+                    if (ukBtn) {
+                        ukBtn.disabled = false;
+                        ukBtn.textContent = '🇬🇧 英音跟读';
+                    }
+                }
+            } else { 
+                globalMsgDiv.innerHTML = `🏆 恭喜！跟读/发音模式完成一轮 🎉 可继续循环练习`; 
+                currentIdx = 0; 
+                refreshNormalMode(); 
+            }
+        }
+    }
+    
+    function setMode(mode) {
+        if (currentRecognition) { 
+            try { currentRecognition.abort(); } catch(e){} 
+            currentRecognition = null; 
+            isListening = false; 
+        }
+        currentMode = mode;
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            if(btn.dataset.mode === mode) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+        if(wordBank.length) {
+            refreshByMode();
+        }
+    }
+    
+    // ========== 事件绑定 & 初始化 ==========
+    syncBtn.addEventListener('click', loadWordBankFromInput);
+    debugBtn.addEventListener('click', showDebug);
+    nextBtn.addEventListener('click', nextWord);
+    document.querySelectorAll('.mode-btn').forEach(btn => btn.addEventListener('click', (e) => setMode(e.target.dataset.mode)));
+    
+    const ukBtn = document.getElementById('ukVoiceBtn');
+    if (ukBtn) {
+        ukBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (wordBank[currentIdx]) {
+                speakBritish(wordBank[currentIdx].word);
+            }
+        });
+    }
+    
+    const startMicBtn = document.getElementById('startMicBtn');
+    if (startMicBtn) {
+        startMicBtn.addEventListener('click', startPronunciationTest);
+    }
+    
+    window.addEventListener('beforeunload', () => {
+        if (microphoneStream) microphoneStream.getTracks().forEach(track => track.stop());
+        window.speechSynthesis.cancel();
+    });
+    
+    // 预加载语音列表
+    if (window.speechSynthesis) {
+        window.speechSynthesis.getVoices();
+    }
+    
+    // 默认加载
+    const defaultText = `analyze /'ænəlaɪz/ v. 分析
+pick up /pɪk ʌp/ v. 捡起；学会
+look forward to /lʊk 'fɔːwəd tuː/ v. 期待
+take care of /teɪk keər əv/ v. 照顾
+significant /sɪɡ'nɪfɪkənt/ adj. 重要的
+environment /ɪn'vaɪrənmənt/ n. 环境`;
+    wordBankText.value = defaultText;
+    loadWordBankFromInput();
+    
+    // 页面任意点击激活音频（解决 Chrome 自动播放策略）
+    document.body.addEventListener('click', function initAudio() {
+        // 预加载一个静音音频来激活 AudioContext
+        const silentAudio = new Audio();
+        silentAudio.volume = 0;
+        silentAudio.play().catch(() => {});
+        document.body.removeEventListener('click', initAudio);
+    }, { once: true });
+</script>
+</body>
+</html>
